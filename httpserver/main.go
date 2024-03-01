@@ -1,20 +1,31 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 )
 
+const keyServerAddr = "serverAddr" // acts as the key for http server's address value in the http.request context
+
 func getRoot(w http.ResponseWriter, r *http.Request) { // http.HandlerFunc
-	fmt.Printf("got / request\n")             // w is used to conrol the response info being written back to the client that made reqyest(body, status code)
+	ctx := r.Context()
+
+	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
+
+	//fmt.Printf("got / request\n")             // w (interface) is used to conrol the response info being written back to the client that made reqyest(body, status code)
 	io.WriteString(w, "this is my website\n") // r is used to get info about the req that came to server(eg. post req or info about client)
 }
 
 func getHello(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got /hello request\n")
+	ctx := r.Context()
+
+	fmt.Printf("%s: got /hello request\n", ctx.Value(keyServerAddr))
+	//fmt.Printf("got /hello request\n")
 	io.WriteString(w, "hello, http\n") // using w to send some text to response body
 }
 
@@ -39,6 +50,16 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", getRoot)
 	mux.HandleFunc("/hello", getHello)
+
+	ctx, cancelCtx := context.WithCancel(context.Background())
+	serverOne := &http.Server{
+		Addr: ":3333",
+		Handler: mux,
+		BaseContext: func(l net.Listener) context.Context{
+			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
+			return ctx
+		},
+	}
 
 	err := http.ListenAndServe(":3333", mux)
 
