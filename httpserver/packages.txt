@@ -1,0 +1,17 @@
+io ===============================
+    provides two types: Reader and Writer
+        1. io.WriteString: writes the conetents of the string(arg2) to w(arg1) which accepts a slice of bytes
+
+
+http =============================
+    provides http client and server implementations
+        1. http.ResponseWriter: an interface that provides a way for the server to construct an http response to a client's request
+        2. *http.Request: 
+        3. http.HandleFunc: user defined type theat implements a handler interface and makes any noraml funciton as an http handler
+        4. http.ListenAndServe: tells global http server to listen for incooming requests on specific port with optional htt.handler
+
+
+errors ===========================
+    implements functions to manipulate errors
+     to generate errors when something goes wrong
+        1. errors.Is
