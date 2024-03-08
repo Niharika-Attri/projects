@@ -9,9 +9,14 @@ http =============================
         2. *http.Request: 
         3. http.HandleFunc: user defined type theat implements a handler interface and makes any noraml funciton as an http handler
         4. http.ListenAndServe: tells global http server to listen for incooming requests on specific port with optional htt.handler
-
+        5. http.NewServeMux(): allocates and returns a new servemux 
+            servemux -> router 
 
 errors ===========================
     implements functions to manipulate errors
      to generate errors when something goes wrong
-        1. errors.Is
+        1. errors.Is: checks if an error is a specific kind of error. unwraps error (if implements Unwrap method) and compares it to a target error
+
+context =========================
+    provides a mechanism to control the lifecycle, cancellation, and propagation of request across multiple goroutines.
+    1. WithCancel:

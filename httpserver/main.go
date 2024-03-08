@@ -36,7 +36,7 @@ func getHello(w http.ResponseWriter, r *http.Request) {
 // 	err := http.ListenAndServe(":3333", nil) // tells global http server to listen for incooming requests on specific port with optional htt.handler
 // 	// nil value for http.handler: tells listenandserve that you want to use the default server multiplexer and not the one you've set up
 
-// 	// listenandserve is blocking call: program won't continue running until after listenandsever finishes running
+// 	// listenandserve is blocking call: program won't continue running until after listenandsever finishes running or http server is told to shut down
 
 // 	if errors.Is(err, http.ErrServerClosed) {
 // 		fmt.Printf("server closed\n")
