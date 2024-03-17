@@ -13,7 +13,7 @@ import (
 const keyServerAddr = "serverAddr" // acts as the key for http server's address value in the http.request context
 
 func getRoot(w http.ResponseWriter, r *http.Request) { // http.HandlerFunc
-	ctx := r.Context()
+	ctx := r.Context()// creating a new context.Context
 
 	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))
 
@@ -51,7 +51,8 @@ func main() {
 	mux.HandleFunc("/", getRoot)
 	mux.HandleFunc("/hello", getHello)
 
-	ctx, cancelCtx := context.WithCancel(context.Background())
+	//multiple servers
+	ctx, cancelCtx := context.WithCancel(context.Background())// background context is a nono-nil empty context, usually used as the starting point to create any new context => returns a context and a CancelFunc => calling CancelFunc will send the cancellation signal
 	serverOne := &http.Server{
 		Addr: ":3333",
 		Handler: mux,
@@ -60,6 +61,38 @@ func main() {
 			return ctx
 		},
 	}
+
+	serverTwo := &http.Server{
+		Addr: ":4444",
+		Handler: mux,
+		BaseContext: func(l net.Listener) context.Context{
+			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
+			return ctx
+		},
+	}
+
+	go func(){
+		err := serverOne.ListenAndServe()// parameters not provided as before because http.server has already been configured
+		if errors.Is(err, http.ErrServerClosed){
+			fmt.Println("server one closed\n")
+		}else if err != nil{
+			fmt.Println("error listening for server one: %s\n", err)
+		}
+		cancelCtx()// if server ends for some reason, context will end as well
+	}()
+
+	go func(){
+		err := serverTwo.ListenAndServe()
+		if errors.Is(err, http.ErrServerClosed){
+			fmt.Println("server two closed\n")
+		}else if err != nil{
+			fmt.Println("error listening for server two %\n", err)
+		}
+		cancelCtx()
+	}()
+
+	<-ctx.Done()// program will stay running until eithere of the server goroutines ends and cancelcts is called
+	// once context is over, program will exit
 
 	err := http.ListenAndServe(":3333", mux)
 
