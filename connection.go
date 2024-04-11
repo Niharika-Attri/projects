@@ -37,17 +37,33 @@ func main() {
 	}
 
 	// SELECT
-	place := student{} //initialise a student struct to store data
+	//place := student{} //initialise a student struct to store data
 
-	rows, _ := db.Queryx("SELECT username, name, email, dob, password FROM std_data") // queries the database and returns an *sqlx.Rows
+	// rows, _ := db.Queryx("SELECT username, name, email, dob, password FROM std_data") // queries the database and returns an *sqlx.Rows
 
-	for rows.Next() { //prepares the next row for scan method, returns true on success, false if an error occured or there is no next row
-		err := rows.StructScan(&place) //scan current row into 'place' variable
-		if err != nil {
-			log.Fatalln("error scanning:", err)
-		}
-		log.Printf("%#v\n", place) //log the content of place struct for each row
+	// for rows.Next() { //prepares the next row for scan method, returns true on success, false if an error occured or there is no next row
+	// 	err := rows.StructScan(&place) //scan current row into 'place' variable
+	// 	if err != nil {
+	// 		log.Fatalln("error scanning:", err)
+	// 	}
+	// 	log.Printf("%#v\n", place) //log the content of place struct for each row
+	// }
+
+	// OR
+	rows, err := db.Query(`SELECT "username", "email" , "dob" FROM "std_data"`)
+	checkError(err)
+
+	for rows.Next(){
+		var userName string
+		var email string
+		var dob string
+
+		err = rows.Scan(&userName, &email, &dob)
+		checkError(err)
+
+		fmt.Println(rows)
 	}
+	
 
 	// INSERT (hardcoded)
 	// insertN := `insert into "std_data"(username, name, email, dob, password) values('annaH', 'Anna Heath', 'annaheath@gmail.com', '12-08-1999', 'annaheath')`
@@ -65,10 +81,27 @@ func main() {
 	// }
 
 	// UPDATE
-	updateN := `update std_data set username = 'annaheath' where name = 'Anna Heath'`
-	_, e = db.Exec(updateN)
-	fmt.Println(e)
-	if err != nil{
-		panic(e)
+	// updateN := `update std_data set username = 'annaheath' where name = 'Anna Heath'`
+	// _, e := db.Exec(updateN)
+	// fmt.Println(e)
+	// if err != nil{
+	// 	panic(e)
+	// }
+
+	// DELETE
+	// deletesm := `delete from std_data where username = $1`
+	// _,e := db.Exec(deletesm, "johnkeats")
+	// fmt.Println(e)
+	// if err != nil{
+	// 	panic(e)
+	// }
+
+
+}
+
+// check error
+func checkError(err error){
+	if err !=nil{
+		panic(err)
 	}
 }
