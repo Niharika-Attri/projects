@@ -50,7 +50,7 @@ func main() {
 	// }
 
 	// OR
-	rows, err := db.Query(`SELECT "username", "email" , "dob" FROM "std_data"`)
+	rows, err := db.Queryx(`SELECT "username", "email" , "dob" FROM "std_data"`)
 	checkError(err)
 
 	for rows.Next(){
@@ -61,7 +61,7 @@ func main() {
 		err = rows.Scan(&userName, &email, &dob)
 		checkError(err)
 
-		fmt.Println(rows)
+		fmt.Println("username: ", userName ,"\n email: ", email,"\n dob: ", dob)
 	}
 	
 
